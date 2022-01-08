@@ -24,7 +24,7 @@ def test_get_circle_centers():
     # test if circles fully cover the rect
     for sw, ne, w, h, r, circles in generate_testcases():
         # test with 1000 random points
-        for tst in range(1000):
+        for _ in range(1000):
             # choose random point within rect
             p = (random.uniform(0,w), random.uniform(0,h))
             # translate to lat/lng
@@ -34,4 +34,4 @@ def test_get_circle_centers():
                 bearing=0
             )
             # check if point is contained in any of the calculated circles
-            assert any([vincenty(pp, Point(c[0], c[1])).meters <= r for c in circles])
+            assert any(vincenty(pp, Point(c[0], c[1])).meters <= r for c in circles)

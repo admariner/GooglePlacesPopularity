@@ -16,7 +16,7 @@ from pymongo import MongoClient
 def retrievePoiAndInsertToMongo(url, token=None):
    try:
       print(url)
-      if not token is None:
+      if token is not None:
          token = "&pagetoken="+token
          url += token
 
@@ -30,7 +30,7 @@ def retrievePoiAndInsertToMongo(url, token=None):
          for result in results_paginated:
             #print(result)
 
-            if not ("place_id" in result):
+            if "place_id" not in result:
                print("place_id should exist in returning results, skipping this POI record")
                continue;
 

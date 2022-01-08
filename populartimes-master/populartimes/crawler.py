@@ -107,7 +107,7 @@ def cover_rect_with_cicles(w, h, r):
 
     # top-right circle is not always required
     if res and not rect_circle_collision(0, w, 0, h, res[-1][0], res[-1][1], r):
-        res = res[0:-1]
+        res = res[:-1]
 
     return res
 
@@ -129,7 +129,7 @@ def get_circle_centers(b1, b2, radius):
     dist_lng = vincenty(Point(sw[0], sw[1]), Point(sw[0], ne[1])).meters
 
     circles = cover_rect_with_cicles(dist_lat, dist_lng, radius)
-    cords = [
+    return [
         VincentyDistance(meters=c[0])
         .destination(
             VincentyDistance(meters=c[1])
@@ -138,8 +138,6 @@ def get_circle_centers(b1, b2, radius):
         )[:2]
         for c in circles
     ]
-
-    return cords
 
 
 def worker_radar():
@@ -458,7 +456,7 @@ def check_response_code(resp):
     :param resp: json response
     :return:
     """
-    if resp["status"] == "OK" or resp["status"] == "ZERO_RESULTS":
+    if resp["status"] in ["OK", "ZERO_RESULTS"]:
         return
 
     if resp["status"] == "REQUEST_DENIED":
@@ -470,11 +468,6 @@ def check_response_code(resp):
                                     "You exceeded your Query Limit for Google Places API Web Service, "
                                     "check https://developers.google.com/places/web-service/usage "
                                     "to upgrade your quota.")
-
-    if resp["status"] == "INVALID_REQUEST":
-        raise PopulartimesException("Google Places " + resp["status"],
-                                    "The query string is malformed, "
-                                    "check if your formatting for lat/lng and radius is correct.")
 
     if resp["status"] == "INVALID_REQUEST":
         raise PopulartimesException("Google Places " + resp["status"],
@@ -524,7 +517,7 @@ def run(_params):
     logging.info("{} places to process...".format(len(g_places)))
 
     # threading for detail search and popular times
-    for i in range(params["n_threads"]):
+    for _ in range(params["n_threads"]):
         t = threading.Thread(target=worker_detail)
         t.daemon = True
         t.start()
